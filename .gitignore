@@ -1,0 +1,46 @@
+# Environment files with sensitive data
+.env.local
+.env.*.local
+*.env
+
+# Azure credentials
+azure.credentials
+*.key
+*.pem
+
+# Test output files
+test_output/
+test_output_*.jpg
+test_output_*.png
+test_output_*.webp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Docker volumes (if mounted locally)
+thumbor-storage/
+thumbor-cache/
+redis-data/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,131 @@
+# Copyright (c) 2025-2026 Matthew Williams
+# SPDX-License-Identifier: MIT
+#
+# This file is released under the MIT License.
+# See the LICENSE file in the project root for the full license text.
+
+#version: '3.8'
+
+services:
+  thumbor:
+    image: cloudcreatordotio.azurecr.io/thumbor:${VERSION}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Uncomment and modify the platform based on your needs:
+      # For development on ARM Macs:
+      # platform: linux/arm64
+      # For Azure deployment or x86_64 systems:
+      # platform: linux/amd64
+      # For multiplatform (requires buildx):
+      # platforms:
+      #   - linux/amd64
+      #   - linux/arm64
+    container_name: thumbor
+    ports:
+      - "${PORT}:80"
+    environment:
+      # Security
+      - SECURITY_KEY=${SECURITY_KEY:-INSECURE_DEV_KEY_CHANGE_IN_PRODUCTION}
+      - ALLOW_UNSAFE_URL=${ALLOW_UNSAFE_URL:-True}
+
+      # Process Configuration
+      - THUMBOR_NUM_PROCESSES=${THUMBOR_NUM_PROCESSES:-4}
+
+      # CORS
+      - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN:-*}
+
+      # Image Format Settings
+      - AUTO_WEBP=${AUTO_WEBP:-True}
+      - AUTO_PNG_TO_JPG=${AUTO_PNG_TO_JPG:-False}
+      - WEBP_QUALITY=${WEBP_QUALITY:-80}
+      - QUALITY=${QUALITY:-80}
+
+      # Cache Configuration
+      - THUMBOR_PROXY_CACHE_SIZE=${THUMBOR_PROXY_CACHE_SIZE:-10g}
+      - THUMBOR_PROXY_CACHE_MEMORY_SIZE=${THUMBOR_PROXY_CACHE_MEMORY_SIZE:-512m}
+      - THUMBOR_PROXY_CACHE_INACTIVE=${THUMBOR_PROXY_CACHE_INACTIVE:-256m}
+      - THUMBOR_PROXY_CACHE_DURATION=${THUMBOR_PROXY_CACHE_DURATION:-1m}
+
+      # HTTP Loader
+      - HTTP_LOADER_FORWARD_USER_AGENT=${HTTP_LOADER_FORWARD_USER_AGENT:-True}
+      - HTTP_LOADER_TIMEOUT=${HTTP_LOADER_TIMEOUT:-60}
+
+      # Azure Blob Storage Configuration
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-}
+      - AZURE_STORAGE_ACCOUNT_NAME=${AZURE_STORAGE_ACCOUNT_NAME:-}
+      - AZURE_STORAGE_ACCOUNT_KEY=${AZURE_STORAGE_ACCOUNT_KEY:-}
+      - AZURE_STORAGE_SAS_TOKEN=${AZURE_STORAGE_SAS_TOKEN:-}
+      - AZURE_USE_MANAGED_IDENTITY=${AZURE_USE_MANAGED_IDENTITY:-False}
+      - AZURE_STORAGE_DEFAULT_CONTAINER=${AZURE_STORAGE_DEFAULT_CONTAINER:-media}
+      - AZURE_KNOWN_PATH_PREFIXES=${AZURE_KNOWN_PATH_PREFIXES:-perm,temp,cache,uploads,files,documents,images}
+
+      # Storage
+      - STORAGE_EXPIRATION_SECONDS=${STORAGE_EXPIRATION_SECONDS:-2592000}
+      - RESULT_STORAGE_EXPIRATION_SECONDS=${RESULT_STORAGE_EXPIRATION_SECONDS:-0}
+
+      # Upload Settings
+      - UPLOAD_ENABLED=${UPLOAD_ENABLED:-True}
+      - UPLOAD_DELETE_ALLOWED=${UPLOAD_DELETE_ALLOWED:-False}
+
+      # Limits
+      - MAX_WIDTH=${MAX_WIDTH:-3000}
+      - MAX_HEIGHT=${MAX_HEIGHT:-3000}
+
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+
+      # Optional: Sentry for error tracking
+      - SENTRY_DSN_URL=${SENTRY_DSN_URL:-}
+
+      # Development: Enable SSH debugging (not recommended for production)
+      - ENABLE_SSH=${ENABLE_SSH:-false}
+
+    volumes:
+      # Persistent storage for cache and data
+      - thumbor-storage:/data/thumbor/storage
+      - thumbor-cache:/var/cache/nginx
+      - thumbor-logs:/app/logs
+      - redis-data:/data/redis
+
+    # Extra hosts from original configuration for local development
+   
+    extra_hosts:
+      
+      - "assets.blob.core.windows.net:0.1.2.3"
+  
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 2G
+          cpus: '1.0'
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:{$PORT}/healthcheck"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  thumbor-storage:
+    driver: local
+  thumbor-cache:
+    driver: local
+  thumbor-logs:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  default:
+    driver: bridge

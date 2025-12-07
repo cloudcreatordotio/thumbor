@@ -1,0 +1,118 @@
+# Thumbor Core - Latest stable version
+thumbor==7.7.7
+
+# Image Processing Libraries
+Pillow>=10.3.0
+opencv-python-headless>=4.9.0.80
+numpy>=1.24.3
+scikit-image>=0.21.0
+
+# Thumbor Redis Integration
+tc-redis>=2.4.0
+redis>=5.0.1
+hiredis>=2.3.2
+
+# RemoteCV for face/feature detection
+remotecv>=5.0.0
+
+# Web Framework Dependencies
+tornado>=6.4
+pycurl>=7.45.2
+
+# Image Format Support
+py-lz4framed>=0.14.0
+python-magic>=0.4.27
+# pyexiv2 - removed due to complex dependencies
+
+# Video Processing
+imageio>=2.31.1
+imageio-ffmpeg>=0.4.9
+
+# URL and HTTP handling
+urllib3>=2.1.0
+certifi>=2023.11.17
+requests>=2.31.0
+
+# Crypto and Security
+pycrypto>=2.6.1
+cryptography>=41.0.7
+
+# Optimization Tools
+mozjpeg-lossless-optimization>=1.1.3
+pngquant>=1.0.7
+
+# AWS Support (optional but useful for Azure Blob Storage compatibility)
+boto3>=1.34.11
+botocore>=1.34.11
+
+# Azure Blob Storage Support
+azure-storage-blob>=12.19.0
+azure-identity>=1.15.0
+
+# Monitoring and Metrics
+statsd>=4.0.1
+prometheus-client>=0.19.0
+
+# Error Tracking (optional)
+sentry-sdk>=1.39.1
+
+# Logging - Structured JSON logging for Azure
+python-json-logger>=2.0.7
+
+# Async Support
+greenlet>=3.0.3
+gevent>=23.9.1
+
+# Color Management
+colorama>=0.4.6
+colour>=0.1.5
+
+# Additional Image Processing
+wand>=0.6.13
+cairosvg>=2.7.1
+pypdf>=3.17.4
+
+# Performance and Caching
+pylibmc>=1.6.3
+python-memcached>=1.61
+
+# Thumbor Plugins and Extensions
+thumbor-plugins>=0.2.4
+# thumbor-aws has no version 7.0.0, using latest available
+thumbor-aws>=0.9.0
+
+# JSON Processing
+ujson>=5.9.0
+simplejson>=3.19.2
+
+# Date/Time handling
+python-dateutil>=2.8.2
+pytz>=2023.3.post1
+
+# Configuration Management
+python-dotenv>=1.0.0
+configparser>=6.0.0
+
+# Process Management - using system package from apt instead
+# supervisor>=4.2.5
+
+# Thumbor Community Storage Backends
+# thumbor-memcached only has version 5.1.0 available
+thumbor-memcached>=5.1.0
+
+# GIF Processing - gifsicle binary is installed via apt
+# gifsicle-python>=0.1.0
+
+# WebP Support - using system library
+# webp>=0.3.0
+
+# AVIF Support (optional, for next-gen image formats)
+# pillow-avif-plugin>=1.4.1
+
+# JPEG-XL Support (optional, may not be available for all architectures)
+# jxlpy>=0.9.3
+
+# Redis Admin Web Interface
+Flask>=3.0.0
+Flask-CORS>=4.0.0
+numpy==1.26.4
