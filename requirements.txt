@@ -1,5 +1,5 @@
 # Thumbor Core - Latest stable version
-thumbor==7.7.7
+thumbor==7.8.0
 
 # Image Processing Libraries
 Pillow>=10.3.0

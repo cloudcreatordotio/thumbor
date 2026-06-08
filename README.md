@@ -1,10 +1,10 @@
 # Thumbor Azure Web App Container
 
-This is a single-container implementation of Thumbor image processing service optimized for Azure Web App deployment. It combines Thumbor 7.7.7, Nginx caching proxy, Redis, and RemoteCV into a single container managed by Supervisord.
+This is a single-container implementation of Thumbor image processing service optimized for Azure Web App deployment. It combines Thumbor 7.8.0, Nginx caching proxy, Redis, and RemoteCV into a single container managed by Supervisord.
 
 ## Features
 
-- **Thumbor 7.7.7**: Latest stable version with improved performance and features
+- **Thumbor 7.8.0**: Latest stable version with security fixes, improved performance and features
 - **Azure Blob Storage Integration**: Native support for loading images from Azure Blob Storage with SAS tokens
 - **Nginx Caching Proxy**: High-performance caching layer with configurable cache sizes
 - **Redis**: Internal Redis server for storage and queueing
@@ -591,7 +591,7 @@ This single container replaces the previous multi-container setup with these map
 
 | Old Service | New Implementation | Notes |
 |-------------|-------------------|-------|
-| thumbor:6.7.5 | thumbor:7.7.7 | Upgraded version |
+| thumbor:6.7.5 | thumbor:7.8.0 | Upgraded version |
 | nginx-proxy | Internal Nginx | Integrated caching |
 | remotecv | Internal RemoteCV | Same functionality |
 | External Redis | Internal Redis | No external dependency |
