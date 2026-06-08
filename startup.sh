@@ -11,14 +11,8 @@ echo "Starting Thumbor container services..."
 echo "======================================="
 
 # Azure Web App provides PORT environment variable
-if [ -n "$PORT" ]; then
-    echo "Azure PORT detected: $PORT"
-    # Update nginx to listen on the Azure-provided port
-    sed -i "s/listen 80 default_server;/listen $PORT default_server;/" /etc/nginx/nginx.conf
-    sed -i "s/listen \[::\]:80 default_server;/listen [::]:$PORT default_server;/" /etc/nginx/nginx.conf
-else
-    echo "Using default port 80"
-fi
+export NGINX_PORT=${PORT:-80}
+echo "Nginx will listen on port $NGINX_PORT"
 
 # Initialize Redis data directory with proper permissions
 echo "Initializing Redis data directory..."
@@ -65,22 +59,22 @@ export THUMBOR_PROXY_CACHE_MEMORY_SIZE=${THUMBOR_PROXY_CACHE_MEMORY_SIZE:-1024m}
 export THUMBOR_PROXY_CACHE_INACTIVE=${THUMBOR_PROXY_CACHE_INACTIVE:-512m}
 export THUMBOR_PROXY_CACHE_DURATION=${THUMBOR_PROXY_CACHE_DURATION:-1m}
 
-# Update nginx cache settings based on environment variables
-echo "Configuring Nginx cache settings..."
-if [ -n "$THUMBOR_PROXY_CACHE_SIZE" ]; then
-    sed -i "s/max_size=100g/max_size=${THUMBOR_PROXY_CACHE_SIZE}/" /etc/nginx/nginx.conf
+# Nginx log destinations (stdout/stderr in production, files in development;
+# see ENABLE_FILE_LOGGING handling below for the other services)
+if [ "$ENABLE_FILE_LOGGING" = "false" ]; then
+    export NGINX_ACCESS_LOG=/dev/stdout
+    export NGINX_ERROR_LOG=/dev/stderr
+else
+    export NGINX_ACCESS_LOG=/app/logs/nginx-access.log
+    export NGINX_ERROR_LOG=/app/logs/nginx-error.log
 fi
-if [ -n "$THUMBOR_PROXY_CACHE_MEMORY_SIZE" ]; then
-    sed -i "s/keys_zone=thumbor_cache:1024m/keys_zone=thumbor_cache:${THUMBOR_PROXY_CACHE_MEMORY_SIZE}/" /etc/nginx/nginx.conf
-fi
-if [ -n "$THUMBOR_PROXY_CACHE_INACTIVE" ]; then
-    sed -i "s/inactive=512m/inactive=${THUMBOR_PROXY_CACHE_INACTIVE}/" /etc/nginx/nginx.conf
-fi
-if [ -n "$THUMBOR_PROXY_CACHE_DURATION" ]; then
-    sed -i "s/proxy_cache_valid 200 301 302 1m;/proxy_cache_valid 200 301 302 ${THUMBOR_PROXY_CACHE_DURATION};/" /etc/nginx/nginx.conf
-    sed -i "s/proxy_cache_valid 404 1m;/proxy_cache_valid 404 ${THUMBOR_PROXY_CACHE_DURATION};/" /etc/nginx/nginx.conf
-    sed -i "s/proxy_cache_valid any 1m;/proxy_cache_valid any ${THUMBOR_PROXY_CACHE_DURATION};/" /etc/nginx/nginx.conf
-fi
+
+# Render nginx configuration from template.
+# The variable list is explicit so nginx's own $variables
+# ($remote_addr, $host, ...) are left untouched.
+echo "Rendering Nginx configuration from template..."
+envsubst '${NGINX_PORT} ${NGINX_ACCESS_LOG} ${NGINX_ERROR_LOG} ${THUMBOR_PROXY_CACHE_SIZE} ${THUMBOR_PROXY_CACHE_MEMORY_SIZE} ${THUMBOR_PROXY_CACHE_INACTIVE} ${THUMBOR_PROXY_CACHE_DURATION}' \
+    < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
 # Update Thumbor configuration with environment variables
 if [ -n "$SECURITY_KEY" ]; then
@@ -113,9 +107,8 @@ if [ "$ENABLE_FILE_LOGGING" = "false" ]; then
     sed -i 's|stdout_logfile=/app/logs/nginx.log|stdout_logfile=/dev/stdout|' /etc/supervisor/conf.d/supervisord.conf
     sed -i 's|stderr_logfile=/app/logs/nginx-error.log|stderr_logfile=/dev/stderr|' /etc/supervisor/conf.d/supervisord.conf
 
-    # Nginx access and error logs (from nginx.conf)
-    sed -i 's|access_log /app/logs/nginx-access.log main;|access_log /dev/stdout main;|' /etc/nginx/nginx.conf
-    sed -i 's|error_log /app/logs/nginx-error.log warn;|error_log /dev/stderr warn;|' /etc/nginx/nginx.conf
+    # Nginx access and error logs are handled via NGINX_ACCESS_LOG/NGINX_ERROR_LOG
+    # in the rendered nginx.conf template above
 
     echo "Logging configured for stdout/stderr only (no file accumulation)"
 else

@@ -64,6 +64,8 @@ RUN apt-get install -y \
     vim \
     net-tools \
     apache2-utils \
+    # envsubst (for rendering nginx config template)
+    gettext-base \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -85,7 +87,8 @@ RUN mkdir -p /app/thumbor \
     && mkdir -p /run/nginx
 
 # Copy configuration files
-COPY nginx-cache.conf /etc/nginx/nginx.conf
+# nginx.conf is rendered from this template at container startup (see startup.sh)
+COPY nginx-cache.conf.template /etc/nginx/nginx.conf.template
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY thumbor.conf /app/thumbor/thumbor.conf
 COPY request_logger.py /app/thumbor/request_logger.py
