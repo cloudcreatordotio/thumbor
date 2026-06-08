@@ -591,7 +591,7 @@ This single container replaces the previous multi-container setup with these map
 
 | Old Service | New Implementation | Notes |
 |-------------|-------------------|-------|
-| thumbor:6.7.5 | thumbor:7.8.0 | Upgraded version |
+| thumbor:7.7.7 | thumbor:7.8.0 | Upgraded version |
 | nginx-proxy | Internal Nginx | Integrated caching |
 | remotecv | Internal RemoteCV | Same functionality |
 | External Redis | Internal Redis | No external dependency |
