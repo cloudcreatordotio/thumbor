@@ -78,7 +78,7 @@ docker buildx build --platform linux/amd64,linux/arm64 --push -t myregistry.azur
 ```bash
 # Run the container locally
 docker run -d \
-  --name thumbor-local \
+  --name thumbor \
   -p 8080:80 \
   -e THUMBOR_NUM_PROCESSES=4 \
   -e SECURITY_KEY=your-secure-key \
