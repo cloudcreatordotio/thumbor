@@ -76,10 +76,9 @@ echo "Rendering Nginx configuration from template..."
 envsubst '${NGINX_PORT} ${NGINX_ACCESS_LOG} ${NGINX_ERROR_LOG} ${THUMBOR_PROXY_CACHE_SIZE} ${THUMBOR_PROXY_CACHE_MEMORY_SIZE} ${THUMBOR_PROXY_CACHE_INACTIVE} ${THUMBOR_PROXY_CACHE_DURATION}' \
     < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
-# Update Thumbor configuration with environment variables
-if [ -n "$SECURITY_KEY" ]; then
-    sed -i "s/Config.SECURITY_KEY = .*/Config.SECURITY_KEY = '$SECURITY_KEY'/" /app/thumbor/thumbor.conf
-fi
+# Note: SECURITY_KEY is read directly from the environment by thumbor.conf
+# (Config.SECURITY_KEY = os.environ.get('SECURITY_KEY', ...)), so no in-place
+# rewrite of the config file is needed.
 
 # Configure logging based on ENABLE_FILE_LOGGING environment variable
 echo "Configuring logging (ENABLE_FILE_LOGGING=$ENABLE_FILE_LOGGING)..."

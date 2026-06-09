@@ -106,28 +106,32 @@ http {
         }
 
         # Redis Admin Interface
-        location /redis-admin {
-            proxy_pass http://localhost:8888;
-            proxy_http_version 1.1;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-
-            # Optional: Add basic auth for production
-            # auth_basic "Redis Admin Access";
-            # auth_basic_user_file /etc/nginx/.htpasswd;
-
-            # Disable caching for admin interface
-            proxy_cache off;
-            proxy_no_cache 1;
-            proxy_cache_bypass 1;
-
-            # Timeouts
-            proxy_connect_timeout 30s;
-            proxy_send_timeout 30s;
-            proxy_read_timeout 30s;
-        }
+        # SECURITY: The Redis admin app (redis_admin.py) has no authentication and
+        # exposes arbitrary Redis commands and flush operations. Leave this block
+        # commented out. Only re-enable behind basic auth + an IP allowlist, and
+        # never on a publicly reachable instance.
+        # location /redis-admin {
+        #     proxy_pass http://localhost:8888;
+        #     proxy_http_version 1.1;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        #     proxy_set_header X-Forwarded-Proto $scheme;
+        #
+        #     # Required if re-enabled: basic auth (see setup_redis_admin_auth.sh)
+        #     auth_basic "Redis Admin Access";
+        #     auth_basic_user_file /etc/nginx/.htpasswd;
+        #
+        #     # Disable caching for admin interface
+        #     proxy_cache off;
+        #     proxy_no_cache 1;
+        #     proxy_cache_bypass 1;
+        #
+        #     # Timeouts
+        #     proxy_connect_timeout 30s;
+        #     proxy_send_timeout 30s;
+        #     proxy_read_timeout 30s;
+        # }
 
         # Main proxy to Thumbor
         location / {

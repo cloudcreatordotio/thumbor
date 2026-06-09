@@ -50,6 +50,9 @@ services:
       # HTTP Loader
       - HTTP_LOADER_FORWARD_USER_AGENT=${HTTP_LOADER_FORWARD_USER_AGENT:-True}
       - HTTP_LOADER_TIMEOUT=${HTTP_LOADER_TIMEOUT:-60}
+      # Validate upstream TLS certificates (default True). Set to False only for
+      # trusted internal hosts with self-signed certs.
+      - HTTP_LOADER_VALIDATE_CERTS=${HTTP_LOADER_VALIDATE_CERTS:-True}
 
       # Azure Blob Storage Configuration
       - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-}
@@ -110,7 +113,7 @@ services:
 
     # Health check
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:{$PORT}/healthcheck"]
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT}/healthcheck"]
       interval: 30s
       timeout: 3s
       retries: 3
